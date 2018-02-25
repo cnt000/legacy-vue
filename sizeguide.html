@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Legacy with Vue.js</title>
+  <style>
+    table {
+      display: block;
+    }
+
+    td,
+    th {
+      border: 1px dotted black;
+      width: 12%;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    li {
+      padding: 4px 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div id="app">
+      <div>
+        <ul>
+          <li v-for="type in Object.keys(SizeClasses)">
+            <a :href="`/sizeguide.html?type=${type}`">{{ type }}</a>
+          </li>
+        </ul>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th v-for="header in Object.keys(SizeClasses[type].rows[0])">
+              {{ header }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in SizeClasses[type].rows">
+            <td v-for="cell in Object.keys(row)">
+              {{ row[cell] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        SizeClasses: {},
+        type: "gloves"
+      },
+      mounted: function () {
+        this.type = this.getParameterByName("type");
+        this.getRequestByAjax();
+      },
+      methods: {
+        getRequestByAjax: function () {
+          fetch(
+              "https://media.yoox.biz/ytos/resources/ALEXANDERMCQUEENGROUP/sizeguide/sizeGuideData.json"
+            )
+            .then(response => response.json())
+            .then(data =>
+              this.SizeClasses = data.SizeClasses
+            );
+        },
+        getParameterByName: function (name) {
+          var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+          return (match) ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : this.type
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
